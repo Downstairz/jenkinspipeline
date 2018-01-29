@@ -3,34 +3,14 @@ pipeline {
     stages{
         stage('Build'){
             steps {
-                sh 'mvn clean package'
-            }
-        }
-        stage ('Deploy to Staging'){
-            steps {
-                build job: 'Deploy-to-staging'
-            }
-        }
-
-        stage ('Deploy to Production'){
-            steps{
-                timeout(time:5, unit:'DAYS'){
-                    input message:'Approve PRODUCTION Deployment?'
-                }
-
-                build job: 'Deploy-to-Prod'
+                sh '/Users/bsoumpholphakdy/Documents/apache-maven-3.5.2/bin/mvn clean package'
             }
             post {
                 success {
-                    echo 'Code deployed to Production.'
-                }
-
-                failure {
-                    echo ' Deployment failed.'
+                    echo 'Now Archiving...'
+                    archiveArtifacts artifacts: '**/target/*.war'
                 }
             }
         }
-
-
     }
 }
