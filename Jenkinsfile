@@ -6,7 +6,7 @@ pipeline {
     stages{
         stage('Build'){
             steps {
-                sh '/usr/local/Cellar/maven/3.5.2/bin/mvn clean package-2'
+                sh '/usr/local/Cellar/maven/3.5.2/bin/mvn clean package'
             }
             post {
                 success {
