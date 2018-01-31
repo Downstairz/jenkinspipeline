@@ -1,9 +1,12 @@
 pipeline {
     agent any
+    tools {
+        maven 'localmaven'
+    }
     stages{
         stage('Build'){
             steps {
-                sh 'mvn clean package-2'
+                sh '/usr/local/Cellar/maven/3.5.2/bin/mvn clean package-2'
             }
             post {
                 success {
