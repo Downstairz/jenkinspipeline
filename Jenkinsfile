@@ -19,7 +19,7 @@ pipeline {
 
         stage('Deploy to staging') {
             steps {
-                # a job to define in jenkins
+                /* a job to define in jenkins */
                 build job: 'deploy-to-staging'
             }
 
