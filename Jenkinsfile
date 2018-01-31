@@ -12,7 +12,7 @@ pipeline {
 
     /* trigger directive */
     triggers {
-         pollSCM('* * * * *')
+         pollSCM('H * * * *')
     }
 
     stages {
