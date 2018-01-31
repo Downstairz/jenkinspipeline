@@ -1,10 +1,17 @@
 pipeline {
     agent any
-    tools {
-        maven 'localmaven'
-    }
-    stages{
 
+    parameters {
+         string(name: 'tomcat_dev', defaultValue: '18.216.247.90', description: 'Staging Server')
+         string(name: 'tomcat_prod', defaultValue: '18.217.122.14', description: 'Production Server')
+    }
+
+    /* trigger directive */
+    triggers {
+         pollSCM('* * * * *')
+    }
+
+    stages {
         stage('Build') {
             steps {
                 sh 'mvn clean package'
@@ -13,43 +20,23 @@ pipeline {
                 success {
                     echo 'Now Archiving...'
                     archiveArtifacts artifacts: '**/*.war'
-                    echo 'Archiving is completed!'
                 }
             }
         }
-
-        stage('Deploy to staging') {
-            steps {
-                /* a job to define in jenkins */
-                build job: 'deploy-to-staging'
-            }
-
-            post {
-                success {
-                    echo 'Staging completed'
-                }
-            }
-        }
-
-        stage('Deploy to Production Yo!') {
-            steps {
-            /* 5 days will expire if no one approves of deployment */
-                timeout(time: 5, unit: 'DAYS') {
-                    input message: 'Approve PRODUCTION Deployment?', submitter: 'buddha'
+ 
+        stage ('Deployments') {
+            parallel{
+                stage ('Deploy to Staging'){
+                    steps {
+                        sh "scp -i /Users/bsoumpholphakdy/Downloads/tomcat-demo.pem **/*.war ec2-user@${params.tomcat_dev}:/var/lib/tomcat8/webapps"
+                    }
                 }
 
-                build job: 'deploy-to-production'
-            }
-
-            post {
-                success {
-                    echo 'Production deployment completed.'
+                stage ("Deploy to Production"){
+                    steps {
+                        sh "scp -i /Users/bsoumpholphakdy/Downloads/tomcat-demo.pem **/*.war ec2-user@${params.tomcat_prod}:/var/lib/tomcat8/webapps"
+                    }
                 }
-
-                failure {
-                    echo 'Production deployment failed.'
-                }
-
             }
         }
     }
